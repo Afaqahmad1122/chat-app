@@ -1,7 +1,4 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-import dbConnect from "../db";
-
-dbConnect();
 
 export interface IMessage extends Document {
   sender: Types.ObjectId;

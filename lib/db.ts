@@ -7,12 +7,6 @@ declare global {
   };
 }
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
-
-if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI in .env.local");
-}
-
 let cached = global.mongoose;
 
 if (!cached) {
@@ -20,6 +14,13 @@ if (!cached) {
 }
 
 async function dbConnect() {
+  // Check MONGODB_URI inside function (after env is loaded)
+  const MONGODB_URI = process.env.MONGODB_URI || "";
+
+  if (!MONGODB_URI) {
+    throw new Error("Please define MONGODB_URI in .env.local");
+  }
+
   if (cached.conn) {
     return cached.conn;
   }

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import dbConnect from "@/lib/db";
 import Message from "@/lib/models/Message";
 import { verifyToken } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
+    // Connect to database
+    await dbConnect();
+
     // Get token from header
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "");

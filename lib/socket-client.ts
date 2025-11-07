@@ -17,6 +17,7 @@ export function useSocket(token: string | null) {
       auth: {
         token,
       },
+      transports: ["websocket", "polling"], // Add transports explicitly
     });
 
     newSocket.on("connect", () => {
@@ -24,9 +25,20 @@ export function useSocket(token: string | null) {
       setIsConnected(true);
     });
 
-    newSocket.on("disconnect", () => {
-      console.log("Socket disconnected");
+    newSocket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
       setIsConnected(false);
+    });
+
+    // Add error handling
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error.message);
+      setIsConnected(false);
+    });
+
+    // Handle authentication errors
+    newSocket.on("error", (error) => {
+      console.error("Socket error:", error);
     });
 
     setSocket(newSocket);

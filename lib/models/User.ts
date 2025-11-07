@@ -1,7 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import dbConnect from "../db";
-
-dbConnect();
 
 export interface IUser extends Document {
   username: string;

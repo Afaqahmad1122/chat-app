@@ -24,26 +24,45 @@ export function initializeSocket(server: HTTPServer) {
     try {
       const token = socket.handshake.auth.token;
 
+      console.log(
+        "Socket auth attempt - Token received:",
+        token ? "Yes" : "No"
+      );
+
       if (!token) {
+        console.log("Socket auth error: No token provided");
         return next(new Error("Authentication error: No token provided"));
       }
 
-      const decoded = verifyToken(token);
+      // Remove "Bearer " prefix if present
+      const cleanToken = token.startsWith("Bearer ") ? token.slice(7) : token;
+
+      const decoded = verifyToken(cleanToken);
 
       if (!decoded) {
+        console.log("Socket auth error: Token verification failed");
+        console.log("Token (first 20 chars):", cleanToken.substring(0, 20));
         return next(new Error("Authentication error: Invalid token"));
       }
+
+      console.log("Token decoded successfully, userId:", decoded.userId);
 
       const user = await User.findById(decoded.userId);
 
       if (!user) {
+        console.log(
+          "Socket auth error: User not found for userId:",
+          decoded.userId
+        );
         return next(new Error("Authentication error: User not found"));
       }
 
       socket.data.userId = user._id.toString();
       socket.data.username = user.username;
+      console.log("Socket authenticated successfully for user:", user.username);
       next();
     } catch (error) {
+      console.error("Socket auth exception:", error);
       next(new Error("Authentication error"));
     }
   });
